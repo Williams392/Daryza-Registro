@@ -1,0 +1,144 @@
+<div  style="background: var(--bs-dark-bg-subtle);">
+
+    <main class="content py-2">
+      <div class="container-fluid">
+        <div class="card border-0">
+          <nav aria-label="breadcrumb" style="margin-bottom: 0;">
+            <ol class="breadcrumb" style="margin-bottom: 0;">
+              <i class="bi bi-house p-2"></i>
+              <li class="breadcrumb-item p-2"><a href="#">Inicio</a></li>
+              <li class="breadcrumb-item active p-2" aria-current="page">Datos de Inventario</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </main>
+  
+    <br>
+  
+    <div class="p-4 bg-zinc-100">
+
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">DATOS DE INVENTARIO</h2>
+        </div>
+  
+        <div class="flex space-x-4">
+
+          <!-- Lista de productos -->
+          <div class="w-1/3">
+
+              <div class="bg-white p-4 rounded-lg shadow-md h-64 overflow-y-auto">
+                  <ul class="space-y-2">
+                      <li 
+                          *ngFor="let producto of productos" 
+                          (click)="selectProduct(producto)" 
+                          [ngClass]="{'cursor-pointer': true, 'bg-blue-100': selectedProduct === producto}">
+                          {{ producto.nombreProd }}
+                      </li>
+                    </ul>
+              </div>
+          </div>
+
+    
+  
+        <div class="w-2/3">
+
+            <div class="bg-white p-3 rounded-lg shadow-md">
+                <div class="grid grid-cols-2 gap-4">
+                  
+                    
+                  <div>
+                        <label class="block text-sm font-medium">Categoria Producto</label>
+                        <select class="w-full p-2 border border-zinc-300 rounded-md dark:border-zinc-500">
+                          <option value="Limpieza">Limpieza</option>
+                          <option value="Lavajillas">Lavajillas</option>
+                          <option value="Papeles">Papeles</option>
+                          <option value="Servilletas">Servilletas</option>
+                          <option value="Quimicos de Limpieza">Quimicos de Limpieza</option>
+                        </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-medium">Código</label>
+                      <input
+                            type="text"
+                            [value]="selectedProduct?.codigoProd || ''"
+                            class="w-full p-2 border border-zinc-300 rounded-md dark:border-zinc-500"
+                            readonly
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium">Descripción</label>
+                      <input
+                          type="text"
+                          [value]="selectedProduct?.descripcion || ''"
+                          class="w-full p-2 border border-zinc-300 rounded-md dark:border-zinc-500"
+                          readonly
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium">Ubicación</label>
+                      <select class="w-full p-2 border border-zinc-300 rounded-md dark:border-zinc-500">
+                        <option *ngFor="let almacen of almacenes" [value]="almacen.num_Almacen">{{ almacen.ubi_Almacen }}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium">Cantidad</label>
+                      <input
+                          type="number"
+                          [(ngModel)]="cantidadExistencia"
+                          class="w-full p-2 border border-zinc-300 rounded-md dark:border-zinc-500"
+                      />
+                    </div>
+                    
+                </div>
+            </div>      
+        </div>
+    </div>
+
+    <div class="flex space-x-4 mt-4 justify-center">
+        <button class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="cancelar()">Cancelar</button>
+        <button class="bg-black text-white px-4 py-2 rounded-lg" (click)="guardarProducto()">REGISTRAR</button>
+
+    </div>
+  
+        <!-- Form de Registro: -->
+    
+        <div class="mt-4 bg-white dark:bg-zinc-700 p-4 rounded-lg shadow-md overflow-x-auto">
+    
+        <table class="table table-striped table-hover align-middle mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Código</th>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Ubicación</th>
+                    <th scope="col">Eliminar</th>
+                    <th scope="col">Editar</th>
+                </tr>
+            </thead>
+            <tbody>
+
+              <tr *ngFor="let producto of productosRegistrados">
+                  <!-- <td>{{ producto.num_GuiaInv?.tipoProd }}</td> -->
+                  <td>{{ producto.num_GuiaInv.tipoProd }}</td>
+                  <td>{{ producto.codigoProd }}</td>
+                  <td>{{ producto.nombreProd }}</td>
+                  <td>{{ producto.cantidadExistencia }}</td>
+                  <td>{{ producto.num_GuiaInv.num_Almacen.ubi_Almacen }}</td>
+
+                  <td>
+                    <button  
+                    class="btn btn-warning btn-sm me-3">Editar</button>
+                  </td>
+                  <td>
+                    <button (click)="eliminarProducto(producto.codigoProd)" 
+                    class="btn btn-danger btn-sm">Eliminar</button>
+                  </td>
+              </tr>
+            </tbody>
+        </table>
+    </div>
+
+  </div>

@@ -1,0 +1,55 @@
+:root {
+    --bs-dark-bg-subtle: #343a40; /* Ejemplo de color oscuro */
+  }
+  
+  .main {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .container-fluid {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .card.border-0 {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .breadcrumb {
+    margin: 0; /* Ajusta este valor según sea necesario */
+    padding: 0; /* Ajusta este valor según sea necesario */
+  }
+  
+  .breadcrumb-item {
+    padding: 0; /* Ajusta este valor según sea necesario */
+  }
+  
+  nav[aria-label="breadcrumb"] {
+    margin: 0; /* Ajusta este valor según sea necesario */
+    padding: 0; /* Ajusta este valor según sea necesario */
+  }
+  
+  /* nav[aria-label="breadcrumb"] ol {
+    padding: 0;
+  }
+  
+  .breadcrumb-item + .breadcrumb-item::before {
+    padding: 0;
+  }
+  
+  .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
+    transform: rotate(45deg);
+  }
+   */
+
+/* del mouse: */
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.bg-blue-100 {
+  background-color: #ebf8ff;
+}
