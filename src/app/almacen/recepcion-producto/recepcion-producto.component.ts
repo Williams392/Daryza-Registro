@@ -30,25 +30,41 @@ export class RecepcionProductoComponent implements OnInit {
   }
 
   guardarProducto(): void {
-    // Validar antes de guardar, por ejemplo, asegurar que la cantidad recibida sea mayor que cero
-    if (this.nuevoProducto.cantidadExistencia <= 0) {
-      alert('La cantidad recibida debe ser mayor que cero.');
-      return;
+    if (this.validarProducto(this.nuevoProducto)) {
+      this.productoService.agregarProducto(this.nuevoProducto).subscribe(
+        (productoAgregado: Producto) => {
+          console.log('Producto agregado:', productoAgregado); // nuevo
+          this.productosRegistrados.push(productoAgregado);
+          this.nuevoProducto = new Producto(); // Limpiar formulario después de agregar
+        },
+        (error) => {
+          console.error('Error al agregar producto', error);
+        }
+      );
     }
-
-    // Llamar al servicio para agregar el nuevo producto
-    this.productoService.agregarProducto(this.nuevoProducto).subscribe(
-      (productoAgregado: Producto) => {
-        this.productosRegistrados.push(productoAgregado); // Agregar a la lista de productos registrados
-        this.nuevoProducto = new Producto(); // Limpiar formulario después de agregar
-      },
-      (error) => {
-        console.error('Error al agregar producto', error);
-      }
-    );
   }
 
-  // Boton eliminar:
+  validarProducto(producto: Producto): boolean {
+    if (!producto.nombreProd || producto.nombreProd.trim() === '') {
+      alert('El nombre del producto es obligatorio.');
+      return false;
+    }
+    if (!producto.descripcion || producto.descripcion.trim() === '') {
+      alert('La descripción del producto es obligatoria.');
+      return false;
+    }
+    if (producto.cantidadExistencia <= 0) {
+      alert('La cantidad recibida debe ser mayor que cero.');
+      return false;
+    }
+    if (!producto.marca || producto.marca.trim() === '') {
+      alert('La marca del producto es obligatoria.');
+      return false;
+    }
+    // Agrega más validaciones según tus necesidades
+    return true;
+  }
+
   eliminarProducto(id: number) {
     this.productoService.eliminarProducto(id).subscribe(
       () => {

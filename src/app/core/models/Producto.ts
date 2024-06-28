@@ -12,9 +12,19 @@ export class Producto {
     calidadP: string;
     cantidadExistencia: number;
     precioProd: number;
+
+    categoria: string;
+    ubicacion: string;
+
     codRequer: Hoja_Requerimientos;
     almacenero: Almacenero;
     num_GuiaInv: Guia_Inventario; 
     numAlmacen: Almacen;
     id_guiaProd: Guia_Productos;
+  
 }
+
+// constructor() {
+//     this.num_GuiaInv = new Guia_Inventario();
+//     this.numAlmacen = new Almacen();
+// }

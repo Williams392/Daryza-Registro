@@ -6,6 +6,7 @@
     "strict": true,
     "noImplicitOverride": true,
     "strictPropertyInitialization": false, /* Para la clase producto en app */
+    // "strictNullChecks": false,  /* Yo para que me permitar el signo de ? en TypeScript */
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -29,5 +30,7 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  
+  
 }

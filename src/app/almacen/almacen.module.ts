@@ -5,7 +5,7 @@ import { RecepcionProductoComponent } from './recepcion-producto/recepcion-produ
 import { AlmacenRoutingModule } from './almacen-routing.module';
 import { HttpClientModule } from '@angular/common/http';
 import { ControlCalidadComponent } from './control-calidad/control-calidad.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GuiaInventarioComponent } from './guia-inventario/guia-inventario.component';
 import { GuiaProductoComponent } from './guia-producto/guia-producto.component';
 import { RegistroInventarioComponent } from './registro-inventario/registro-inventario.component';
@@ -23,7 +23,8 @@ import { RegistroInventarioComponent } from './registro-inventario/registro-inve
     CommonModule,
     AlmacenRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ]
 })
 export class AlmacenModule { }

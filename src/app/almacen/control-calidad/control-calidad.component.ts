@@ -3,6 +3,8 @@ import { ProductoService } from '../../core/services/producto.service';
 import { Producto } from '../../core/models/Producto';
 import { HojaRequerimientosService } from '../../core/services/hoja_requirimiento.service';
 import { Hoja_Requerimientos } from '../../core/models/Hoja_Requerimientos';
+import { AlmacenService } from '../../core/services/almacen.service';
+import { Almacen } from '../../core/models/Almacen';
 
 @Component({
   selector: 'app-control-calidad',
@@ -11,53 +13,83 @@ import { Hoja_Requerimientos } from '../../core/models/Hoja_Requerimientos';
 })
 export class ControlCalidadComponent implements OnInit {
 
+  productosRegistrados: Producto[] = [];
   productos: Producto[] = [];
-  selectedProduct: Producto | null = null;
-  productosRegistrados: any[] = [];
+  selectedProduct: Producto = new Producto(); // Inicialización con un objeto Producto vacío
   cantidadExistencia: number = 0;
-  calidadP: string = 'Aceptable';
+  Hojas_Requerimiento: Hoja_Requerimientos[] = [];
 
-  constructor(private productoService: ProductoService) { }
+  constructor(
+    private productoService: ProductoService,
+    private hojaRequerimientoService: HojaRequerimientosService
+  ) {}
 
   ngOnInit(): void {
     this.obtenerProductos();
+    this.obtenerHojasRequerimientos();
+  }
+
+  obtenerHojasRequerimientos(): void {
+    this.hojaRequerimientoService.obtenerHojasRequerimientos().subscribe(
+      (Hojas_Requerimiento: Hoja_Requerimientos[]) => {
+        this.Hojas_Requerimiento = Hojas_Requerimiento;
+      },
+      (error) => {
+        console.error('Error al obtener hojas de requerimientos:', error);
+      }
+    );
   }
 
   obtenerProductos(): void {
     this.productoService.obtenerProductos().subscribe(
-      productos => {
+      (productos: Producto[]) => {
         this.productos = productos;
       },
-      error => {
-        console.error('Error obteniendo productos:', error);
+      (error) => {
+        console.error('Error al obtener productos:', error);
       }
     );
   }
 
   selectProduct(producto: Producto): void {
-    this.selectedProduct = producto;
-    this.cantidadExistencia = producto.cantidadExistencia; // Mostrar cantidad existente del producto
-    this.calidadP = producto.calidadP || 'Aceptable'; // Mostrar calidad del producto o valor por defecto
+    this.selectedProduct = { ...producto }; // Copiar el producto seleccionado para evitar cambios directos
+    this.cantidadExistencia = producto.cantidadExistencia || 0;
+
+    // Asignar la Calidad seleccionada
+    if (producto.codRequer) {
+      this.selectedProduct.calidadP = producto.codRequer.calidadProd;
+    }
   }
 
   registrarProducto(): void {
-    if (this.selectedProduct) {
-      const productoRegistrado = {
-        ...this.selectedProduct,
-        cantidad: this.cantidadExistencia,
-        calidad: this.calidadP
-      };
-      this.productosRegistrados.push(productoRegistrado);
-      // Resetear los campos después de registrar
-      this.selectedProduct = null;
-      this.cantidadExistencia = 0;
-      this.calidadP = 'Aceptable';
+    if (this.selectedProduct && this.selectedProduct.codigoProd) {
+      // Asignación de la calidad (calidadP)
+      const requerimientoSeleccionado = this.Hojas_Requerimiento.find(requerimiento => requerimiento.calidadProd === this.selectedProduct.calidadP);
+      if (requerimientoSeleccionado) {
+        this.selectedProduct.calidadP = requerimientoSeleccionado.calidadProd;
+      }
+
+      // Actualización del producto en la base de datos
+      this.productoService.actualizarProducto(this.selectedProduct.codigoProd, this.selectedProduct).subscribe(
+        (productoActualizado: Producto) => {
+          const index = this.productosRegistrados.findIndex(prod => prod.codigoProd === productoActualizado.codigoProd);
+          if (index !== -1) {
+            this.productosRegistrados[index] = { ...productoActualizado };
+          } else {
+            this.productosRegistrados.push({ ...productoActualizado });
+          }
+  
+          this.cancelar(); // Limpia el formulario después de registrar
+        },
+        error => {
+          console.error('Error al actualizar el producto:', error);
+        }
+      );
     }
   }
 
   cancelar(): void {
-    this.selectedProduct = null;
+    this.selectedProduct = new Producto(); // Reinicializar selectedProduct
     this.cantidadExistencia = 0;
-    this.calidadP = 'Aceptable';
   }
 }

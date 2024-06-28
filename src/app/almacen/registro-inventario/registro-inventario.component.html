@@ -1,1 +1,89 @@
-<p>registro-inventario works!</p>
+
+<div style="background: var(--bs-dark-bg-subtle);">
+
+    <main class="content py-2">
+      <div class="container-fluid">
+        <div class="card border-0">
+          <nav aria-label="breadcrumb" style="margin-bottom: 0;">
+            <ol class="breadcrumb" style="margin-bottom: 0;">
+              <i class="bi bi-house p-2"></i>
+              <li class="breadcrumb-item p-2"><a href="#">Inicio</a></li>
+              <li class="breadcrumb-item active p-2" aria-current="page">Retgistro de Inventario</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </main>
+  
+    <br>
+  
+    <div>       
+        <div class="p-4 mx-auto bg-zinc-100 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold mb-4 text-center">REGISTRO DE INVENTARIO</h2>
+            <div div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  
+            <div class="bg-white p-4 rounded-lg shadow-md h-72"> 
+
+                <div class="mb-2">
+                    <label class="block text-zinc-700">LISTA DE PRODUCTOS CON CANTIDAD ACTUAL</label>
+                    <select class="w-full p-2 border border-zinc-300 rounded-md dark:border-zinc-500"
+                            id="categoria" name="categoria" required
+                            (change)="selectProduct($event)">
+                      <option *ngFor="let producto of productosRegistrados" [value]="producto.codigoProd">{{ producto.nombreProd }}</option>
+                    </select>
+                  </div>
+
+                <div class="mb-2">
+                    <label class="block text-zinc-700">PRODUCTOS</label>
+                    <input type="text" [(ngModel)]="nuevoProducto.nombreProd" class="w-full p-2 border rounded-md"/>
+                </div>
+                <div class="mb-2">
+                    <label class="block text-sm font-medium">INGRESAR LA NUEVA CANTIDAD EN INVENTARIO</label>
+                    <input type="number" [(ngModel)]="nuevoProducto.cantidadExistencia" class="w-full p-2 border rounded" />
+                </div>
+                
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg shadow-md flex justify-center h-72">
+              <img src="assets/img/img_daryza.jpeg" alt="Imagen Daryza" class="object-cover mb-4">
+            </div>
+
+        </div>
+  
+        <div class="mt-4 flex justify-between items-center">
+            <div class="flex items-center">
+              <label class="block text-zinc-700 mr-2">CANTIDAD RECIBIDA</label>
+              <input type="text" [(ngModel)]="nuevoProducto.cantidadExistencia" class="w-16 p-2 border rounded-md text-center" readonly />
+            </div>
+            <div class="flex space-x-4 mt-4">
+
+                <button class="bg-black text-white px-4 py-2 rounded-lg" (click)="guardarProducto()">ACTUALIZAR INVENTARIO</button>
+                <button class="bg-red-500 text-white px-4 py-2 rounded-lg" (click)="cancelar()">Cancelar</button>
+              
+            </div>
+        </div>
+  
+        <div class="mt-4 overflow-x-auto">
+            <!-- FORM DE REGISTRO: -->
+            <div class="mt-4 bg-white dark:bg-zinc-700 p-4 rounded-lg shadow-md overflow-x-auto">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">Código</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let producto of productosRegistrados">
+                            <td>{{ producto.codigoProd }}</td>
+                            <td>{{ producto.descripcion }}</td>
+                            <td>{{ producto.cantidadExistencia }}</td>
+                        </tr>
+                    </tbody>
+                    </table>
+             </div>
+  
+        </div>
+    </div> 
+</div>

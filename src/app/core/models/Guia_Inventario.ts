@@ -1,5 +1,5 @@
 import { Almacen } from "./Almacen";
-import { Almacenero } from "./Almacenero";
+import { Producto } from "./Producto";
 
 export class Guia_Inventario {
     num_GuiaInv: number;
@@ -7,4 +7,7 @@ export class Guia_Inventario {
     tipoProd: string;
     cantProdActual: number;
     num_Almacen: Almacen;
+    
+    codigoProd: Producto;  // Referencia al producto
+
 }

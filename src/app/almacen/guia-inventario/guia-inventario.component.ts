@@ -4,6 +4,7 @@ import { Producto } from '../../core/models/Producto';
 import { AlmacenService } from '../../core/services/almacen.service';
 import { Almacen } from '../../core/models/Almacen';
 import { Guia_Inventario } from '../../core/models/Guia_Inventario';
+import { GuiaInventarioService } from '../../core/services/guia_inventario.service';
 
 @Component({
   selector: 'app-guia-inventario',
@@ -11,44 +12,27 @@ import { Guia_Inventario } from '../../core/models/Guia_Inventario';
   styleUrl: './guia-inventario.component.css'
 })
 export class GuiaInventarioComponent implements OnInit {
-
-  nuevoProducto: Producto = new Producto();
   productosRegistrados: Producto[] = [];
+  productos: Producto[] = [];
 
-  productos: Producto[] = []; // Para el select de la lista de productos.
-  selectedProduct: Producto | null = null;
-
+  selectedProduct: Producto = new Producto(); // Inicialización con un objeto Producto vacío
   cantidadExistencia: number = 0;
   almacenes: Almacen[] = [];
+  
+  guiasInventario: Guia_Inventario[] = [];
 
   constructor(
     private productoService: ProductoService,
+    private guiaInventarioService: GuiaInventarioService,
     private almacenService: AlmacenService
   ) {}
 
   ngOnInit(): void {
-    this.obtenerProductos(); 
-    this.obtenerProductosRegistrar();
+    this.obtenerProductos();
     this.obtenerAlmacenes();
+    this.obtenerGuiasInventario();
   }
   
-  // Para la el panel de lista de productos:
-  obtenerProductos(): void {
-    this.productoService.obtenerProductos().subscribe(
-      (productos: Producto[]) => {
-        this.productos = productos; // Asigna los productos obtenidos al arreglo de productos
-      },
-      (error) => {
-        console.error('Error al obtener productos:', error);
-      }
-    );
-  }
-  selectProduct(producto: Producto): void {
-    this.selectedProduct = producto;
-    this.cantidadExistencia = producto.cantidadExistencia;
-    // this.cantidadExistencia = producto.cantidadExistencia || 0;
-  }
-
   obtenerAlmacenes(): void {
     this.almacenService.obtenerAlmacenes().subscribe(
       almacenes => {
@@ -59,55 +43,85 @@ export class GuiaInventarioComponent implements OnInit {
       }
     );
   }
-
-
-  // IMPORTANTE - PARA EL REGISTRO DEL FORM:
   
-  obtenerProductosRegistrar(): void {
-    this.productoService.obtenerProductos().subscribe(
-      (datos: Producto[]) => {
-        this.productosRegistrados = datos;
-      },
-      (error) => {
-        console.error('Error al obtener productos', error);
-      }
-    );
-  }
-
-  guardarProducto(): void {
-    if (this.nuevoProducto.cantidadExistencia <=0){
-      alert('La cantidad recibida debe ser mayor que cero.');
-      return;
-    }
-
-    // llamar al servicio para agregar el producto
-    this.productoService.agregarProducto(this.nuevoProducto).subscribe(
-      productoAgregado => {
-        this.productosRegistrados.push(productoAgregado);
-        this.nuevoProducto = new Producto();
+  obtenerGuiasInventario(): void {
+    this.guiaInventarioService.obtenerGuiasInventario().subscribe(
+      guiasInventario => {
+        this.guiasInventario = guiasInventario;
       },
       error => {
-        console.error('Error al agregar producto:', error);
+        console.error('Error obteniendo guías de inventario:', error);
       }
     );
-
   }
 
-  cancelar(): void {
-    this.selectedProduct = null;
-    this.cantidadExistencia = 0;
-  }
-
-  // Boton eliminar:
-  eliminarProducto(id: number) {
-    this.productoService.eliminarProducto(id).subscribe(
-      () => {
-        this.obtenerProductosRegistrar(); // Actualizar la lista de productos después de eliminar
+  obtenerProductos(): void {
+    this.productoService.obtenerProductos().subscribe(
+      (productos: Producto[]) => {
+        this.productos = productos;
       },
       (error) => {
-        console.error('Error al eliminar producto', error);
+        console.error('Error al obtener productos:', error);
       }
     );
   }
+
+  selectProduct(producto: Producto): void {
+    this.selectedProduct = { ...producto }; // Copiar el producto seleccionado para evitar cambios directos
+    this.cantidadExistencia = producto.cantidadExistencia || 0;
   
+    // Asignar la ubicación seleccionada
+    if (producto.numAlmacen) {
+      this.selectedProduct.ubicacion = producto.numAlmacen.ubi_Almacen;
+    }
+  
+    // Asignar la categoría seleccionada
+    if (producto.num_GuiaInv) {
+      this.selectedProduct.categoria = producto.num_GuiaInv.tipoProd;
+    }
+  }
+  
+
+  registrarProducto(): void {
+    if (this.selectedProduct && this.selectedProduct.codigoProd) {
+      // Asignación de la categoría (tipoProd) y ubicación (ubi_Almacen)
+      if (this.selectedProduct.num_GuiaInv) {
+        const guiaSeleccionada = this.guiasInventario.find(guia => guia.num_GuiaInv === this.selectedProduct.num_GuiaInv.num_GuiaInv);
+        if (guiaSeleccionada) {
+          this.selectedProduct.num_GuiaInv.tipoProd = guiaSeleccionada.tipoProd;
+        }
+      }
+      
+      if (this.selectedProduct.numAlmacen) {
+        const almacenSeleccionado = this.almacenes.find(almacen => almacen.num_Almacen === this.selectedProduct.numAlmacen.num_Almacen);
+        if (almacenSeleccionado) {
+          this.selectedProduct.numAlmacen.ubi_Almacen = almacenSeleccionado.ubi_Almacen;
+        }
+      }
+  
+      // Actualización del producto en la base de datos
+      this.productoService.actualizarProducto(this.selectedProduct.codigoProd, this.selectedProduct).subscribe(
+        (productoActualizado: Producto) => {
+          const index = this.productosRegistrados.findIndex(prod => prod.codigoProd === productoActualizado.codigoProd);
+          if (index !== -1) {
+            this.productosRegistrados[index] = { ...productoActualizado };
+          } else {
+            this.productosRegistrados.push({ ...productoActualizado });
+          }
+  
+          this.cancelar(); // Limpia el formulario después de registrar
+        },
+        error => {
+          console.error('Error al actualizar el producto:', error);
+        }
+      );
+    }
+  }
+  
+  
+
+  cancelar(): void {
+    this.selectedProduct = new Producto(); // Reinicializar selectedProduct
+    this.cantidadExistencia = 0;
+  }
 }
